@@ -1,5 +1,5 @@
 # craftos-kindle
-A fork of CraftOS-native designed to run with kterm on a Kindle E-Reader
+A fork of CraftOS-native designed to run with kterm on a Kindle E-Reader. Uses code from craftos-efi and craftosos which are both made by JackMacWindows and are under the MIT license
 
 ## Building
 To build, you must have:
