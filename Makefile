@@ -1,7 +1,7 @@
 CC?=gcc
-CFLAGS+=-ansi
+CFLAGS+=-g -I/usr/include/lua5.1
 LDFLAGS?=
-LIBS=-llua.5.1 -lm -ldl -lncurses
+LIBS=-llua5.1 -lm -ldl -lncurses
 
 craftos: obj/fs_handle.o obj/fs.o obj/keys.o obj/lib.o obj/main.o obj/os.o obj/queue.o obj/term.o
 	$(CC) $(LDFLAGS) -o craftos obj/fs_handle.o obj/fs.o obj/keys.o obj/lib.o obj/main.o obj/os.o obj/queue.o obj/term.o $(LIBS)

@@ -3,19 +3,24 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <ncurses.h>
 #include "bit.h"
 #include "fs.h"
 #include "os.h"
 #include "term.h"
 #include "redstone.h"
 #include "keys.h"
+#include "queue.h"
 
 int main() {
     int status, result, i, narg;
     double sum;
     lua_State *L;
     lua_State *coro;
+	extern lua_State *paramQueue;
+	extern queue_t eventQueue;
 start:
+	eventQueue._front = eventQueue._back = NULL;
     /*
      * All Lua contexts are held in this structure. We work with it almost
      * all the time.
@@ -23,6 +28,7 @@ start:
     L = luaL_newstate();
 
     coro = lua_newthread(L);
+	paramQueue = lua_newthread(L);
 
     luaL_openlibs(coro); /* Load Lua libraries */
     load_library(coro, bit_lib);
@@ -78,14 +84,14 @@ end");
     lua_call(L, 0, 0);
 
     /* Load the file containing the script we are going to run */
-    status = luaL_loadfile(coro, "/bios.lua");
+    status = luaL_loadfile(coro, "/mnt/craftos/bios.lua");
     if (status) {
         /* If something went wrong, error message is at the top of */
         /* the stack */
         fprintf(stderr, "Couldn't load file: %s\n", lua_tostring(L, -1));
         exit(1);
     }
-
+	
     /* Ask Lua to run our little script */
     status = LUA_YIELD;
     narg = 0;

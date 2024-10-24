@@ -29,6 +29,7 @@ const char * label;
 bool label_defined = false;
 queue_t eventQueue;
 lua_State * paramQueue;
+queue_t timerQueue;
 struct time_t_list * timers = NULL;
 struct double_list * alarms = NULL;
 int nextTimerID = 0;
@@ -73,17 +74,21 @@ int getNextEvent(lua_State *L, const char * filter) {
             }
             ch = getch();
             if (ch != 0) {
-                if ((ch >= 32 && ch < 128)) {
-                    tmp[0] = ch;
-                    lua_pushstring(param, tmp);
-                    queue_push(&eventQueue, "char");
-                    param = lua_newthread(paramQueue);
-                }
-                cch = getKey(ch);
+				cch = getKey(ch);
                 if (cch != 0) {
                     lua_pushinteger(param, cch);
                     lua_pushboolean(param, false);
                     queue_push(&eventQueue, "key");
+					param = lua_newthread(paramQueue);
+					lua_pushinteger(param, cch);
+                    queue_push(&eventQueue, "key_up");
+					param = lua_newthread(paramQueue);
+                }
+				if ((ch >= 32 && ch < 128)) {
+                    tmp[0] = ch;
+					tmp[1] = 0;
+                    lua_pushstring(param, tmp);
+                    queue_push(&eventQueue, "char");
                     param = lua_newthread(paramQueue);
                 }
             }

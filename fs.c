@@ -18,6 +18,18 @@
 #endif
 
 char * fixpath(const char * path) {
+	char * prefix = "/mnt/craftos";
+    char * retval = (char*)malloc(strlen(path) + 2 + strlen(prefix));
+	memset(retval, 0, strlen(path) + 2 + strlen(prefix));
+	strcpy(retval,prefix);
+    if (path[0] != '/') {
+        retval[12] = '/';
+        strcat(&retval[13], path);
+    } else strcat(retval, path);
+    return retval;
+}
+
+char * fixpath_old(const char * path) {
     char * retval = (char*)malloc(strlen(path) + 2);
     if (path[0] != '/') {
         retval[0] = '/';
@@ -96,13 +108,13 @@ int getmntpt(char *path, char *mount_point) {
     struct stat cur_stat;
     struct stat last_stat;
 
-    char dir_name[PATH_MAX];
+    char dir_name[MAX_PATH];
     char *dirname_p = dir_name;
     char cur_cwd[255];
     char *cur_cwd_p = cur_cwd;
-    char saved_cwd[PATH_MAX];
+    char saved_cwd[MAX_PATH];
     size_t path_len, suffix_len, dir_len;
-    if (getcwd(saved_cwd, PATH_MAX) == NULL) {
+    if (getcwd(saved_cwd, MAX_PATH) == NULL) {
         errno = EIO;
         return ERROR;
     }
@@ -140,7 +152,7 @@ int getmntpt(char *path, char *mount_point) {
             return ERROR;
         last_stat = cur_stat;
     }
-    if (getcwd(mount_point, PATH_MAX) == NULL)
+    if (getcwd(mount_point, MAX_PATH) == NULL)
         return ERROR;
     if (chdir(saved_cwd) < 0)
         return ERROR;
@@ -148,7 +160,7 @@ int getmntpt(char *path, char *mount_point) {
 }
 
 int fs_getDrive(lua_State *L) {
-    char mountpoint[PATH_MAX];
+    char mountpoint[MAX_PATH];
     char * path = fixpath(lua_tostring(L, 1));
     if (!getmntpt(path, mountpoint)) {free(path); return 0;}
     lua_pushstring(L, mountpoint);
@@ -247,7 +259,7 @@ int fs_delete(lua_State *L) {
 int fs_combine(lua_State *L) {
     char * localPath, *retval;
     const char * basePath = lua_tostring(L, 1);
-    localPath = fixpath(lua_tostring(L, 2));
+    localPath = fixpath_old(lua_tostring(L, 2));
     if (basePath[0] == '/') basePath = basePath + 1;
     if (basePath[strlen(basePath)-1] == '/') localPath = localPath + 1;
     retval = (char*)malloc(strlen(basePath) + strlen(localPath) + 1);
