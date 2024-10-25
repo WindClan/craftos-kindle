@@ -4,15 +4,18 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <ncurses.h>
-#define TERM_WIDTH 80
-#define TERM_HEIGHT 25
 
 unsigned int cursorX = 0, cursorY = 0;
 unsigned char colors = 0x07;
 const unsigned char colorMap[16] = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 
+unsigned int TERM_WIDTH;
+unsigned int TERM_HEIGHT;
+
 void termInit() {
     int i;
+	TERM_HEIGHT = 23;
+	TERM_WIDTH = 46;
     initscr();
     keypad(stdscr, TRUE);
     noecho();
